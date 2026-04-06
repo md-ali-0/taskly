@@ -33,14 +33,14 @@ export default function ForgotPasswordForm() {
 
   return (
     <div className="w-full">
-      <div className="mb-8 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary/80">
+      <div className="mb-5 text-center">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">
           Password recovery
         </p>
-        <h1 className="mt-3 text-3xl font-extrabold text-foreground">
+        <h1 className="mt-1.5 text-[24px] font-extrabold text-foreground">
           Forgot your password?
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-1.5 text-[13px] text-muted-foreground">
           Enter your email and we will send you a reset link.
         </p>
       </div>
@@ -51,10 +51,12 @@ export default function ForgotPasswordForm() {
         onFinish={handleSubmit}
         requiredMark={false}
         size="large"
+        className="space-y-0.5"
       >
         <Form.Item
           name="email"
           label="Email"
+          className="mb-3.5"
           rules={[
             { required: true, message: "Email is required" },
             { type: "email", message: "Enter a valid email" },
@@ -63,12 +65,12 @@ export default function ForgotPasswordForm() {
           <Input className="auth-input" placeholder="you@example.com" />
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" loading={isLoading} block size="large">
+        <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-10 rounded-md font-semibold">
           Send reset link
         </Button>
       </Form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-4 text-center text-[13px] text-muted-foreground">
         Remembered your password?{" "}
         <Link href="/auth/signin" className="font-semibold text-primary hover:underline">
           Back to sign in

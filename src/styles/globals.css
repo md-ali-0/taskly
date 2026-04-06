@@ -37,8 +37,8 @@
     --destructive: #dc2626;
     --border: #d9e2f0;
     --ring: #3b82f6;
-    --radius: 1rem;
-    --button-radius: 12px;
+    --radius: 6px;
+    --button-radius: 6px;
     --antd-color-info: var(--primary);
     --antd-color-success: #10b981;
     --antd-color-warning: #f59e0b;
@@ -84,16 +84,42 @@
   }
 
   .surface-card {
-    @apply rounded-xl border border-white/70 bg-white/80 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] backdrop-blur;
+    @apply rounded-md border border-white/70 bg-white/80 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] backdrop-blur;
   }
 
   .auth-input.ant-input,
   .auth-input.ant-input-affix-wrapper,
   .auth-input .ant-input {
-    border-radius: 14px;
+    border-radius: 6px;
     border-color: #d7dfec;
     box-shadow: none;
-    min-height: 48px;
+    min-height: 42px;
+    padding-inline: 14px;
+    font-size: 14px;
+  }
+
+  .auth-input.ant-input {
+    height: 42px;
+  }
+
+  .auth-input.ant-input-affix-wrapper {
+    height: 42px;
+    padding-block: 0;
+    padding-inline: 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .auth-input.ant-input-affix-wrapper .ant-input {
+    min-height: auto;
+    height: auto;
+    padding-inline: 0;
+    line-height: 1.2;
+  }
+
+  .auth-input.ant-input-affix-wrapper .ant-input-suffix {
+    display: flex;
+    align-items: center;
   }
 
   .auth-input.ant-input-affix-wrapper:hover,

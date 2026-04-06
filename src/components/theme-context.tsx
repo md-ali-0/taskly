@@ -51,8 +51,8 @@ function loadTokensFromCss(): ThemeTokens {
     fontSizeBase: 14,
     fontFamily:
       "var(--font-body), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    borderRadius: parseFloat(readCssVar("--radius")) * 6 || 6,
-    buttonRadius: parseFloat(readCssVar("--button-radius")) || 12,
+    borderRadius: parseFloat(readCssVar("--radius")) || 6,
+    buttonRadius: parseFloat(readCssVar("--button-radius")) || 6,
   };
 }
 
@@ -78,7 +78,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       fontSizeBase: 14,
       fontFamily: "var(--font-body), -apple-system, sans-serif",
       borderRadius: 6,
-      buttonRadius: 12,
+      buttonRadius: 6,
     }),
     [],
   );

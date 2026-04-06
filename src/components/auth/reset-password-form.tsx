@@ -52,14 +52,14 @@ export default function ResetPasswordForm() {
 
   return (
     <div className="w-full">
-      <div className="mb-8 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary/80">
+      <div className="mb-6 text-center">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">
           New password
         </p>
-        <h1 className="mt-3 text-3xl font-extrabold text-foreground">
+        <h1 className="mt-1.5 text-[24px] font-extrabold text-foreground">
           Reset your password
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-1.5 text-[13px] text-muted-foreground">
           Choose a new secure password to continue.
         </p>
       </div>
@@ -70,10 +70,12 @@ export default function ResetPasswordForm() {
         onFinish={handleSubmit}
         requiredMark={false}
         size="large"
+        className="space-y-1"
       >
         <Form.Item
           name="password"
           label="New password"
+          className="mb-3.5"
           rules={[
             { required: true, message: "Password is required" },
             { min: 8, message: "Password must be at least 8 characters" },
@@ -85,6 +87,7 @@ export default function ResetPasswordForm() {
         <Form.Item
           name="confirmPassword"
           label="Confirm password"
+          className="mb-3.5"
           rules={[{ required: true, message: "Please confirm your password" }]}
         >
           <Input.Password
@@ -93,12 +96,12 @@ export default function ResetPasswordForm() {
           />
         </Form.Item>
 
-        <Button type="primary" htmlType="submit" loading={isLoading} block size="large">
+        <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-10 rounded-md font-semibold">
           Reset password
         </Button>
       </Form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-5 text-center text-[13px] text-muted-foreground">
         Return to{" "}
         <Link href="/auth/signin" className="font-semibold text-primary hover:underline">
           sign in

@@ -61,15 +61,15 @@ export default function LoginForm() {
 
   return (
     <div className="w-full">
-      <div className="mb-8 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-primary/80">
+      <div className="mb-5 text-center">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/80">
           Welcome back
         </p>
-        <h1 className="mt-3 text-3xl font-extrabold text-foreground">
+        <h1 className="mt-1.5 text-[24px] font-extrabold text-foreground">
           Sign in to Taskly
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Continue with your workspace, tasks, and dashboard setup.
+        <p className="mt-1.5 text-[13px] text-muted-foreground">
+          Continue to your dashboard.
         </p>
       </div>
 
@@ -79,10 +79,12 @@ export default function LoginForm() {
         onFinish={handleLogin}
         requiredMark={false}
         size="large"
+        className="space-y-0.5"
       >
         <Form.Item
           name="email"
           label="Email"
+          className="mb-3.5"
           rules={[
             { required: true, message: "Email is required" },
             { type: "email", message: "Enter a valid email" },
@@ -94,26 +96,27 @@ export default function LoginForm() {
         <Form.Item
           name="password"
           label="Password"
+          className="mb-3.5"
           rules={[{ required: true, message: "Password is required" }]}
         >
           <Input.Password className="auth-input" placeholder="Password" />
         </Form.Item>
 
-        <div className="mb-5 flex justify-end">
+        <div className="mb-3 flex justify-end">
           <Link
             href="/auth/forgot-password"
-            className="text-sm font-semibold text-primary hover:underline"
+            className="text-[13px] font-semibold text-primary hover:underline"
           >
             Forgot password?
           </Link>
         </div>
 
-        <Button type="primary" htmlType="submit" loading={isLoading} block size="large">
+        <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-10 rounded-md font-semibold">
           Sign in
         </Button>
       </Form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-4 text-center text-[13px] text-muted-foreground">
         Need an account?{" "}
         <Link href="/auth/signup" className="font-semibold text-primary hover:underline">
           Sign up
