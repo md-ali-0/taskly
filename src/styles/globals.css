@@ -34,9 +34,15 @@
     --secondary-foreground: #1e3a8a;
     --muted: #edf2f7;
     --muted-foreground: #526074;
+    --destructive: #dc2626;
     --border: #d9e2f0;
     --ring: #3b82f6;
     --radius: 1rem;
+    --button-radius: 12px;
+    --antd-color-info: var(--primary);
+    --antd-color-success: #10b981;
+    --antd-color-warning: #f59e0b;
+    --antd-color-error: var(--destructive);
   }
 
   * {

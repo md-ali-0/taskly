@@ -39,10 +39,10 @@ function readCssVar(name: string) {
 function loadTokensFromCss(): ThemeTokens {
   return {
     colorPrimary: readCssVar("--primary"),
-    colorSuccess: "#10b981",
-    colorWarning: "#f59e0b",
-    colorError: readCssVar("--primary"),
-    colorInfo: readCssVar("--primary"),
+    colorSuccess: readCssVar("--antd-color-success"),
+    colorWarning: readCssVar("--antd-color-warning"),
+    colorError: readCssVar("--destructive"),
+    colorInfo: readCssVar("--antd-color-info"),
     colorTextBase: readCssVar("--foreground"),
     colorTextSecondary: readCssVar("--muted-foreground"),
     colorBgContainer: readCssVar("--card"),
@@ -52,7 +52,7 @@ function loadTokensFromCss(): ThemeTokens {
     fontFamily:
       "var(--font-body), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     borderRadius: parseFloat(readCssVar("--radius")) * 6 || 6,
-    buttonRadius: 12,
+    buttonRadius: parseFloat(readCssVar("--button-radius")) || 12,
   };
 }
 
