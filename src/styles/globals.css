@@ -79,8 +79,33 @@
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
+  .site-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
   .surface-card {
     @apply rounded-xl border border-white/70 bg-white/80 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.35)] backdrop-blur;
+  }
+
+  .auth-input.ant-input,
+  .auth-input.ant-input-affix-wrapper,
+  .auth-input .ant-input {
+    border-radius: 14px;
+    border-color: #d7dfec;
+    box-shadow: none;
+    min-height: 48px;
+  }
+
+  .auth-input.ant-input-affix-wrapper:hover,
+  .auth-input.ant-input:hover {
+    border-color: color-mix(in srgb, var(--primary) 35%, white);
+  }
+
+  .auth-input.ant-input-affix-wrapper-focused,
+  .auth-input.ant-input:focus,
+  .auth-input.ant-input-focused {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 }
 

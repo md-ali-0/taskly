@@ -1,11 +1,11 @@
 "use client";
 
 import config from "@/config";
+import { tags } from "@/constants";
 import { useSession } from "@/provider/session-provider";
 import { baseApi } from "@/redux/api/baseApi";
 import { setConnected, setError } from "@/redux/features/socket/socketSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { tags } from "@/redux/tag-types";
 import { notification } from "antd";
 import React, { createContext, useContext, useEffect, useRef } from "react";
 import { io, type Socket } from "socket.io-client";

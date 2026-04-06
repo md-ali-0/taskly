@@ -1,6 +1,6 @@
 "use client";
 
-import { getSession } from "@/lib/session";
+import { getSession, setSession as persistSession } from "@/lib/session";
 import type { TSession } from "@/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -27,6 +27,11 @@ export const SessionProvider = ({
   const [session, setSession] = useState<TSession>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const updateSession = (value: TSession) => {
+    setSession(value);
+    void persistSession(value);
+  };
+
   useEffect(() => {
     let mounted = true;
 
@@ -47,7 +52,7 @@ export const SessionProvider = ({
 
   return (
     <SessionContext.Provider
-      value={{ session, setSession, isLoading, setIsLoading }}
+      value={{ session, setSession: updateSession, isLoading, setIsLoading }}
     >
       {children}
     </SessionContext.Provider>
