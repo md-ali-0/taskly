@@ -17,7 +17,11 @@ export default function SignupForm() {
     password: string;
   }) => {
     try {
-      const response = await register(values).unwrap();
+      const response = await register({
+        name: values.full_name,
+        email: values.email,
+        password: values.password,
+      }).unwrap();
 
       message.success(
         response?.message ||

@@ -3,8 +3,11 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 type AuthUser = {
   id?: string;
   email?: string;
-  name?: string;
+  name?: string | null;
   role?: string;
+  roles?: string[];
+  status?: string;
+  emailVerified?: boolean;
 };
 
 type AuthState = {

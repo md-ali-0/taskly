@@ -28,7 +28,7 @@ export default function LoginForm() {
           accessToken: data?.accessToken,
           refreshToken: data?.refreshToken,
           user: data?.user,
-          profile: data?.profile,
+          profile: null,
         }),
       );
 
@@ -37,11 +37,11 @@ export default function LoginForm() {
         accessToken: data?.accessToken || null,
         refreshToken: data?.refreshToken || null,
         user: data?.user || null,
-        profile: data?.profile || null,
+        profile: null,
       });
 
       message.success("Welcome back. Login successful.");
-      router.push("/");
+      router.push("/dashboard");
     } catch (error: unknown) {
       const errorMessage =
         typeof error === "object" &&

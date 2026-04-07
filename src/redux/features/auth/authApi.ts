@@ -1,18 +1,43 @@
 import { tags } from "@/constants";
 import { baseApi } from "../../api/baseApi";
 
+type AuthUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  roles: string[];
+  status: string;
+  emailVerified: boolean;
+};
+
+type AuthPayload = {
+  user: AuthUser;
+  accessToken: string;
+  refreshToken: string;
+};
+
+type ApiResponse<T> = {
+  success: boolean;
+  message?: string;
+  data: T;
+};
+
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation({
+    login: builder.mutation<ApiResponse<AuthPayload>, { email: string; password: string }>({
       query: (data: { email: string; password: string }) => ({
         url: "/auth/login",
         method: "POST",
         body: data,
       }),
     }),
-    register: builder.mutation({
+    register: builder.mutation<
+      ApiResponse<AuthPayload>,
+      { name: string; email: string; password: string }
+    >({
       query: (data: {
-        full_name: string;
+        name: string;
         email: string;
         password: string;
       }) => ({
@@ -21,6 +46,19 @@ export const authApi = baseApi.injectEndpoints({
         body: data,
       }),
       invalidatesTags: [tags.userTag],
+    }),
+    getMe: builder.query<ApiResponse<AuthUser>, void>({
+      query: () => ({
+        url: "/users/me",
+        method: "GET",
+      }),
+      providesTags: [tags.userTag],
+    }),
+    logout: builder.mutation<ApiResponse<{ message?: string }>, void>({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
     }),
     forgetPassword: builder.mutation({
       query: (data: { email: string }) => ({
@@ -56,7 +94,9 @@ export const authApi = baseApi.injectEndpoints({
 
 export const {
   useForgetPasswordMutation,
+  useGetMeQuery,
   useLoginMutation,
+  useLogoutMutation,
   useRegisterMutation,
   useResendVerificationEmailMutation,
   useResetPasswordMutation,
