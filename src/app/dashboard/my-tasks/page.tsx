@@ -1,7 +1,10 @@
 "use client";
 
 import Table from "@/components/ui/data-table";
-import { useGetTasksQuery } from "@/redux/features/task/taskApi";
+import {
+  useGetTasksQuery,
+  useUpdateTaskStatusMutation,
+} from "@/redux/features/task/taskApi";
 import { useAppSelector } from "@/redux/hooks";
 import type { Task, TaskStatus } from "@/types";
 import {
@@ -10,7 +13,7 @@ import {
   SearchOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Input, Row, Select, Tag } from "antd";
+import { App, Card, Col, Input, Row, Select, Tag } from "antd";
 import type { ColumnType } from "antd/es/table";
 import { useMemo, useState } from "react";
 
@@ -33,6 +36,7 @@ function renderStatus(status: TaskStatus) {
 }
 
 export default function MyTasksPage() {
+  const { message } = App.useApp();
   const authUser = useAppSelector((state) => state.auth.user);
   const userId = authUser?.id;
 
@@ -57,6 +61,8 @@ export default function MyTasksPage() {
         }
       : undefined,
   );
+  const [updateTaskStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateTaskStatusMutation();
 
   const payload = data?.data;
   const tasks = useMemo(() => payload?.data ?? [], [payload?.data]);
@@ -127,6 +133,37 @@ export default function MyTasksPage() {
           year: "numeric",
         }),
     },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Select
+          value={record.status}
+          size="small"
+          className="min-w-[150px]"
+          options={statusOptions}
+          loading={isUpdatingStatus}
+          onChange={async (status) => {
+            try {
+              await updateTaskStatus({ taskId: record.id, status }).unwrap();
+              message.success("Task status updated successfully.");
+            } catch (error: unknown) {
+              const errorMessage =
+                typeof error === "object" &&
+                error !== null &&
+                "data" in error &&
+                typeof error.data === "object" &&
+                error.data !== null &&
+                "message" in error.data
+                  ? String(error.data.message)
+                  : "Failed to update task status";
+
+              message.error(errorMessage);
+            }
+          }}
+        />
+      ),
+    },
   ];
 
   const resetPagination = (nextLimit = limit) => {
@@ -163,6 +200,18 @@ export default function MyTasksPage() {
   const handleLimitChange = (nextLimit: number) => {
     resetPagination(nextLimit);
   };
+
+  if (!userId) {
+    return (
+      <div className="p-6">
+        <Card variant="borderless" className="shadow-sm border-border/40 bg-card">
+          <p className="text-muted-foreground">
+            Sign in to view and update your assigned tasks.
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
