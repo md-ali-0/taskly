@@ -16,6 +16,8 @@ type GetTasksParams = {
   cursor?: string;
   status?: TaskStatus;
   search?: string;
+  assignedUserId?: string;
+  createdById?: string;
 };
 
 type CreateTaskPayload = {
