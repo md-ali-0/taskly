@@ -23,9 +23,14 @@ type ApiResponse<T> = {
   data: T;
 };
 
+type AuthActionResponse = {
+  message: string;
+  data: AuthPayload;
+};
+
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<ApiResponse<AuthPayload>, { email: string; password: string }>({
+    login: builder.mutation<ApiResponse<AuthActionResponse>, { email: string; password: string }>({
       query: (data: { email: string; password: string }) => ({
         url: "/auth/login",
         method: "POST",
@@ -33,7 +38,7 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
     register: builder.mutation<
-      ApiResponse<AuthPayload>,
+      ApiResponse<AuthActionResponse>,
       { name: string; email: string; password: string }
     >({
       query: (data: {

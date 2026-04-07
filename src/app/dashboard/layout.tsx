@@ -1,14 +1,9 @@
-import Navbar from "@/components/shared/navbar";
+import DashboardLayoutShell from "@/components/shared/dashboard-layout";
 
 export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div className="min-h-screen">
-      <Navbar />
-      <main className="app-shell py-10">{children}</main>
-    </div>
-  );
+  return <DashboardLayoutShell>{children}</DashboardLayoutShell>;
 }

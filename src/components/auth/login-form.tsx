@@ -50,7 +50,11 @@ export default function LoginForm() {
 
     try {
       const response = await signin(values).unwrap();
-      const data = response?.data || response;
+      const data = response?.data?.data || response?.data || response;
+
+      if (!data?.accessToken || !data?.refreshToken || !data?.user) {
+        throw new Error("Authentication payload is missing");
+      }
 
       dispatch(
         login({
@@ -80,6 +84,8 @@ export default function LoginForm() {
         error.data !== null &&
         "message" in error.data
           ? String(error.data.message)
+          : error instanceof Error
+            ? error.message
           : "Login failed";
 
       message.error(errorMessage);

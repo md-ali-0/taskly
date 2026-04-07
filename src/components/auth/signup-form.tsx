@@ -24,6 +24,7 @@ export default function SignupForm() {
       }).unwrap();
 
       message.success(
+        response?.data?.message ||
         response?.message ||
         `Registered successfully. Please sign in.`,
       );

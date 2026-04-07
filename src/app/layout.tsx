@@ -3,7 +3,6 @@ import { MessageInitializer } from "@/components/shared/message-initializer";
 import { ThemeProvider } from "@/components/theme-context";
 import ReduxProvider from "@/provider/redux-provider";
 import { SessionProvider } from "@/provider/session-provider";
-import { SocketProvider } from "@/provider/socket-provider";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { App as AntdApp } from "antd";
 import { Nunito } from "next/font/google";
@@ -41,12 +40,10 @@ export default function RootLayout({
           <SessionProvider>
             <ReduxProvider>
               <ThemeProvider>
-                <SocketProvider>
-                  <AntdApp>
-                    <MessageInitializer />
-                    {children}
-                  </AntdApp>
-                </SocketProvider>
+                <AntdApp>
+                  <MessageInitializer />
+                  {children}
+                </AntdApp>
               </ThemeProvider>
             </ReduxProvider>
           </SessionProvider>
