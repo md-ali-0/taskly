@@ -35,7 +35,7 @@ export default function DashboardHeader({
     const router = useRouter();
     const dispatch = useAppDispatch();
     const { message } = App.useApp();
-    const { session, setSession } = useSession();
+    const { session, setSession, isLoading } = useSession();
     const authUser = useAppSelector((state) => state.auth.user);
     
     const currentUser = authUser || session?.user;
@@ -81,33 +81,46 @@ export default function DashboardHeader({
             </div>
 
             <div className="flex items-center gap-3">
-                <Dropdown
-                    menu={{ items: menuItems }}
-                    placement="bottomRight"
-                    trigger={["click"]}
-                >
-                    <button
-                        type="button"
-                        className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-2.5 py-2 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                {isLoading ? (
+                    <div className="flex h-[54px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-2.5 py-2 shadow-sm">
+                        <div className="h-[38px] w-[38px] animate-pulse rounded-full bg-slate-200" />
+                        <div className="hidden min-w-[112px] sm:block">
+                            <div className="h-3.5 w-24 animate-pulse rounded-full bg-slate-200" />
+                            <div className="mt-2 h-2.5 w-12 animate-pulse rounded-full bg-slate-200" />
+                        </div>
+                        <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-slate-100 sm:flex">
+                            <DownOutlined className="text-xs text-slate-300" />
+                        </div>
+                    </div>
+                ) : (
+                    <Dropdown
+                        menu={{ items: menuItems }}
+                        placement="bottomRight"
+                        trigger={["click"]}
                     >
-                        <Avatar
-                            size={38}
-                            icon={<UserOutlined />}
-                            className="bg-primary text-primary-foreground"
-                        />
-                        <div className="hidden min-w-0 text-left sm:block">
-                            <p className="truncate text-sm font-semibold text-slate-900">
-                                {displayName}
-                            </p>
-                            <p className="truncate text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
-                                {displayRole}
-                            </p>
-                        </div>
-                        <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 sm:flex">
-                            <DownOutlined className="text-xs" />
-                        </div>
-                    </button>
-                </Dropdown>
+                        <button
+                            type="button"
+                            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-2.5 py-2 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                        >
+                            <Avatar
+                                size={38}
+                                icon={<UserOutlined />}
+                                className="bg-primary text-primary-foreground"
+                            />
+                            <div className="hidden min-w-0 text-left sm:block">
+                                <p className="truncate text-sm font-semibold text-slate-900">
+                                    {displayName}
+                                </p>
+                                <p className="truncate text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
+                                    {displayRole}
+                                </p>
+                            </div>
+                            <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 sm:flex">
+                                <DownOutlined className="text-xs" />
+                            </div>
+                        </button>
+                    </Dropdown>
+                )}
             </div>
         </Header>
     );
