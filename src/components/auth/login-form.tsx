@@ -4,7 +4,7 @@ import { useSession } from "@/provider/session-provider";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { login } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
-import { App, Button, Form, Input } from "antd";
+import { App, Button, Dropdown, Form, Input, type MenuProps } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +15,35 @@ export default function LoginForm() {
   const { message } = App.useApp();
   const { setIsLoading, setSession } = useSession();
   const [signin, { isLoading }] = useLoginMutation();
+
+  const fillCredentials = (role: "admin" | "user") => {
+    const credentials = {
+      admin: {
+        email: "admin@taskly.com",
+        password: "Admin@123456",
+      },
+      user: {
+        email: "user@taskly.com",
+        password: "User@123456",
+      },
+    }[role];
+
+    form.setFieldsValue(credentials);
+    message.info(`Filled with ${role} credentials`);
+  };
+
+  const devItems: MenuProps["items"] = [
+    {
+      key: "admin",
+      label: "Admin Account",
+      onClick: () => fillCredentials("admin"),
+    },
+    {
+      key: "user",
+      label: "User Account",
+      onClick: () => fillCredentials("user"),
+    },
+  ];
 
   const handleLogin = async (values: { email: string; password: string }) => {
     setIsLoading(true);
@@ -110,6 +139,19 @@ export default function LoginForm() {
             Forgot password?
           </Link>
         </div>
+
+        {process.env.NODE_ENV === "development" && (
+          <div className="mb-3.5">
+            <Dropdown menu={{ items: devItems }} placement="bottom" trigger={["click"]}>
+              <Button
+                block
+                className="border-amber-200 bg-amber-50 font-semibold text-amber-700 hover:border-amber-300 hover:bg-amber-100"
+              >
+                Fill Credentials
+              </Button>
+            </Dropdown>
+          </div>
+        )}
 
         <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-10 rounded-md font-semibold">
           Sign in
