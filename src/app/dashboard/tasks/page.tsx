@@ -1,11 +1,15 @@
 "use client";
 
 import Table from "@/components/ui/data-table";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useAppSelector } from "@/redux/hooks";
 import {
+  useAssignTaskMutation,
   useCreateTaskMutation,
   useGetTasksQuery,
 } from "@/redux/features/task/taskApi";
-import type { Task, TaskStatus } from "@/types";
+import { useGetUsersQuery } from "@/redux/features/users/usersApi";
+import type { Task, TaskStatus, User } from "@/types";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -13,6 +17,7 @@ import {
   PlusOutlined,
   SearchOutlined,
   SyncOutlined,
+  UserSwitchOutlined,
 } from "@ant-design/icons";
 import {
   App,
@@ -50,8 +55,10 @@ function renderStatus(status: TaskStatus) {
 
 export default function TasksPage() {
     const { message } = App.useApp();
-    const [form] = Form.useForm();
+    const [assignForm] = Form.useForm();
     const [open, setOpen] = useState(false);
+    const [assignOpen, setAssignOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [searchText, setSearchText] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [page, setPage] = useState(1);
@@ -61,6 +68,8 @@ export default function TasksPage() {
     >({ 1: undefined });
 
     const currentCursor = pageCursors[page];
+    const authUser = useAppSelector((state) => state.auth.user);
+    const isAdmin = authUser?.role === "ADMIN";
 
     const { data, isFetching, isLoading } = useGetTasksQuery({
         limit,
@@ -70,9 +79,23 @@ export default function TasksPage() {
         search: searchText || undefined,
     });
     const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
+    const [assignTask, { isLoading: isAssigning }] = useAssignTaskMutation();
+    const { data: usersData, isLoading: isUsersLoading } = useGetUsersQuery(
+        isAdmin
+            ? {
+                  page: 1,
+                  limit: 100,
+                  status: "ACTIVE",
+              }
+            : skipToken,
+    );
 
     const payload = data?.data;
     const tasks = useMemo(() => payload?.data ?? [], [payload?.data]);
+    const assignableUsers = useMemo(
+        () => (usersData?.data?.data ?? []) as User[],
+        [usersData?.data?.data],
+    );
     const nextCursor = payload?.meta?.nextCursor ?? null;
     const hasMore = payload?.meta?.hasMore ?? false;
     const syntheticTotal = hasMore
@@ -155,6 +178,28 @@ export default function TasksPage() {
         },
     ];
 
+    if (isAdmin) {
+        columns.push({
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+                <Button
+                    type="link"
+                    icon={<UserSwitchOutlined />}
+                    onClick={() => {
+                        setSelectedTask(record);
+                        setAssignOpen(true);
+                        assignForm.setFieldsValue({
+                            assignedUserId: record.assignedUserId ?? undefined,
+                        });
+                    }}
+                >
+                    {record.assignedUserId ? "Reassign" : "Assign"}
+                </Button>
+            ),
+        });
+    }
+
     const handleCreate = async (values: {
         title: string;
         description?: string;
@@ -163,7 +208,6 @@ export default function TasksPage() {
         try {
             await createTask(values).unwrap();
             message.success("Task created successfully.");
-            form.resetFields();
             setOpen(false);
             setPage(1);
             setPageCursors({ 1: undefined });
@@ -177,6 +221,35 @@ export default function TasksPage() {
                 "message" in error.data
                     ? String(error.data.message)
                     : "Failed to create task";
+
+            message.error(errorMessage);
+        }
+    };
+
+    const handleAssign = async (values: { assignedUserId?: string }) => {
+        if (!selectedTask) {
+            return;
+        }
+
+        try {
+            await assignTask({
+                taskId: selectedTask.id,
+                assignedUserId: values.assignedUserId || null,
+            }).unwrap();
+            message.success("Task assignment updated successfully.");
+            setAssignOpen(false);
+            setSelectedTask(null);
+            assignForm.resetFields();
+        } catch (error: unknown) {
+            const errorMessage =
+                typeof error === "object" &&
+                error !== null &&
+                "data" in error &&
+                typeof error.data === "object" &&
+                error.data !== null &&
+                "message" in error.data
+                    ? String(error.data.message)
+                    : "Failed to assign task";
 
             message.error(errorMessage);
         }
@@ -386,7 +459,6 @@ export default function TasksPage() {
                 destroyOnHidden
             >
                 <Form
-                    form={form}
                     layout="vertical"
                     onFinish={handleCreate}
                     initialValues={{ status: "PENDING" }}
@@ -420,6 +492,49 @@ export default function TasksPage() {
                             loading={isCreating}
                         >
                             Save Task
+                        </Button>
+                    </Space>
+                </Form>
+            </Modal>
+
+            <Modal
+                open={assignOpen}
+                title={selectedTask ? `Assign: ${selectedTask.title}` : "Assign Task"}
+                footer={null}
+                onCancel={() => {
+                    setAssignOpen(false);
+                    setSelectedTask(null);
+                    assignForm.resetFields();
+                }}
+                destroyOnHidden
+            >
+                <Form form={assignForm} layout="vertical" onFinish={handleAssign}>
+                    <Form.Item label="Assigned User" name="assignedUserId">
+                        <Select
+                            allowClear
+                            loading={isUsersLoading}
+                            placeholder="Select a user"
+                            options={assignableUsers.map((user) => ({
+                                label: user.name
+                                    ? `${user.name} (${user.email})`
+                                    : user.email,
+                                value: user.id,
+                            }))}
+                        />
+                    </Form.Item>
+
+                    <Space className="flex justify-end">
+                        <Button
+                            onClick={() => {
+                                setAssignOpen(false);
+                                setSelectedTask(null);
+                                assignForm.resetFields();
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="primary" htmlType="submit" loading={isAssigning}>
+                            Save Assignment
                         </Button>
                     </Space>
                 </Form>

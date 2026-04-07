@@ -24,6 +24,11 @@ type CreateTaskPayload = {
   status?: TaskStatus;
 };
 
+type AssignTaskPayload = {
+  taskId: string;
+  assignedUserId?: string | null;
+};
+
 export const taskApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getTasks: builder.query<TResponse<TaskListPayload>, GetTasksParams | void>({
@@ -42,8 +47,18 @@ export const taskApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tags.taskTag],
     }),
+    assignTask: builder.mutation<TResponse<Task>, AssignTaskPayload>({
+      query: ({ taskId, assignedUserId }) => ({
+        url: `/tasks/${taskId}/assign`,
+        method: "PATCH",
+        body: {
+          assignedUserId: assignedUserId || null,
+        },
+      }),
+      invalidatesTags: [tags.taskTag],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useCreateTaskMutation, useGetTasksQuery } = taskApi;
+export const { useAssignTaskMutation, useCreateTaskMutation, useGetTasksQuery } = taskApi;
