@@ -17,8 +17,8 @@ interface TableProps<TData> {
   setPage: (page: number) => void;
   limit: number;
   setLimit: (limit: number) => void;
-  setSortBy: (field: string) => void;
-  setSortOrder: (order: string) => void;
+  setSortBy?: (field: string) => void;
+  setSortOrder?: (order: string) => void;
   setStatus?: (value: string | undefined) => void;
   showSizeChanger?: boolean;
   urlParamsUpdate?: boolean;
@@ -68,10 +68,10 @@ export default function Table<TData extends { id: string }>({
 
     void urlParamsUpdate;
 
-    if (sorter.field && sorter.order) {
+    if (sorter.field && sorter.order && setSortBy && setSortOrder) {
       setSortBy(sorter.field);
       setSortOrder(sorter.order === "ascend" ? "asc" : "desc");
-    } else {
+    } else if (setSortBy && setSortOrder) {
       setSortBy("createdAt");
       setSortOrder("desc");
     }
