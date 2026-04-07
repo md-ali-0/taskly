@@ -1,34 +1,6 @@
 import { tags } from "@/constants";
+import type { Task, TaskStatus, TResponse } from "@/types";
 import { baseApi } from "../../api/baseApi";
-
-export type TaskStatus = "PENDING" | "IN_PROGRESS" | "DONE";
-
-export type TaskUser = {
-  id: string;
-  email: string;
-  name: string | null;
-  role: string;
-  status: string;
-};
-
-export type Task = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: TaskStatus;
-  assignedUserId: string | null;
-  createdById: string;
-  createdAt: string;
-  updatedAt: string;
-  assignedUser: TaskUser | null;
-  createdBy: TaskUser;
-};
-
-type ApiResponse<T> = {
-  success: boolean;
-  message?: string;
-  data: T;
-};
 
 type TaskListPayload = {
   data: Task[];
@@ -54,15 +26,15 @@ type CreateTaskPayload = {
 
 export const taskApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getTasks: builder.query<ApiResponse<TaskListPayload>, GetTasksParams | void>({
+    getTasks: builder.query<TResponse<TaskListPayload>, GetTasksParams | void>({
       query: (params) => ({
         url: "/tasks",
         method: "GET",
-        params,
+        params: params ?? undefined,
       }),
       providesTags: [tags.taskTag],
     }),
-    createTask: builder.mutation<ApiResponse<Task>, CreateTaskPayload>({
+    createTask: builder.mutation<TResponse<Task>, CreateTaskPayload>({
       query: (body) => ({
         url: "/tasks",
         method: "POST",
