@@ -24,6 +24,7 @@ type CreateTaskPayload = {
   title: string;
   description?: string;
   status?: TaskStatus;
+  assignedUserId?: string;
 };
 
 type UpdateTaskPayload = {
@@ -67,7 +68,7 @@ export const taskApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: [tags.taskTag],
+      invalidatesTags: [tags.taskTag, tags.auditLogTag],
     }),
     updateTask: builder.mutation<TResponse<Task>, UpdateTaskPayload>({
       query: ({ taskId, ...body }) => ({
@@ -75,7 +76,7 @@ export const taskApi = baseApi.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: [tags.taskTag],
+      invalidatesTags: [tags.taskTag, tags.auditLogTag],
     }),
     assignTask: builder.mutation<TResponse<Task>, AssignTaskPayload>({
       query: ({ taskId, assignedUserId }) => ({
@@ -85,14 +86,14 @@ export const taskApi = baseApi.injectEndpoints({
           assignedUserId: assignedUserId || null,
         },
       }),
-      invalidatesTags: [tags.taskTag],
+      invalidatesTags: [tags.taskTag, tags.auditLogTag],
     }),
     deleteTask: builder.mutation<TResponse<{ message: string }>, { taskId: string }>({
       query: ({ taskId }) => ({
         url: `/tasks/${taskId}`,
         method: "DELETE",
       }),
-      invalidatesTags: [tags.taskTag],
+      invalidatesTags: [tags.taskTag, tags.auditLogTag],
     }),
     updateTaskStatus: builder.mutation<TResponse<Task>, UpdateTaskStatusPayload>({
       query: ({ taskId, status }) => ({
@@ -100,7 +101,7 @@ export const taskApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { status },
       }),
-      invalidatesTags: [tags.taskTag],
+      invalidatesTags: [tags.taskTag, tags.auditLogTag],
     }),
   }),
   overrideExisting: false,

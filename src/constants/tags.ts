@@ -1,6 +1,7 @@
 export const tags = {
   userTag: "userTag",
   taskTag: "taskTag",
+  auditLogTag: "auditLogTag",
   mediaTag: "mediaTag",
   roleTag: "roleTag",
   categoryTag: "categoryTag",
