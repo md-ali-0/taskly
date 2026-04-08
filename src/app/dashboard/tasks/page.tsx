@@ -6,13 +6,17 @@ import { useAppSelector } from "@/redux/hooks";
 import {
   useAssignTaskMutation,
   useCreateTaskMutation,
+  useDeleteTaskMutation,
   useGetTasksQuery,
+  useUpdateTaskMutation,
 } from "@/redux/features/task/taskApi";
 import { useGetUsersQuery } from "@/redux/features/users/usersApi";
 import type { Task, TaskStatus, User } from "@/types";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
   FileTextOutlined,
   PlusOutlined,
   SearchOutlined,
@@ -56,8 +60,10 @@ function renderStatus(status: TaskStatus) {
 export default function TasksPage() {
     const { message } = App.useApp();
     const [assignForm] = Form.useForm();
+    const [editForm] = Form.useForm();
     const [open, setOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [searchText, setSearchText] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -80,6 +86,8 @@ export default function TasksPage() {
     });
     const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
     const [assignTask, { isLoading: isAssigning }] = useAssignTaskMutation();
+    const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
+    const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
     const { data: usersData, isLoading: isUsersLoading } = useGetUsersQuery(
         isAdmin
             ? {
@@ -183,19 +191,62 @@ export default function TasksPage() {
             title: "Actions",
             key: "actions",
             render: (_, record) => (
-                <Button
-                    type="link"
-                    icon={<UserSwitchOutlined />}
-                    onClick={() => {
-                        setSelectedTask(record);
-                        setAssignOpen(true);
-                        assignForm.setFieldsValue({
-                            assignedUserId: record.assignedUserId ?? undefined,
-                        });
-                    }}
-                >
-                    {record.assignedUserId ? "Reassign" : "Assign"}
-                </Button>
+                <Space size="small">
+                    <Button
+                        type="link"
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                            setSelectedTask(record);
+                            setEditOpen(true);
+                            editForm.setFieldsValue({
+                                title: record.title,
+                                description: record.description ?? "",
+                                status: record.status,
+                            });
+                        }}
+                    >
+                        Edit
+                    </Button>
+                    <Button
+                        type="link"
+                        icon={<UserSwitchOutlined />}
+                        onClick={() => {
+                            setSelectedTask(record);
+                            setAssignOpen(true);
+                            assignForm.setFieldsValue({
+                                assignedUserId: record.assignedUserId ?? undefined,
+                            });
+                        }}
+                    >
+                        {record.assignedUserId ? "Reassign" : "Assign"}
+                    </Button>
+                    <Button
+                        type="link"
+                        danger
+                        icon={<DeleteOutlined />}
+                        loading={isDeleting && selectedTask?.id === record.id}
+                        onClick={async () => {
+                            try {
+                                await deleteTask({ taskId: record.id }).unwrap();
+                                message.success("Task deleted successfully.");
+                            } catch (error: unknown) {
+                                const errorMessage =
+                                    typeof error === "object" &&
+                                    error !== null &&
+                                    "data" in error &&
+                                    typeof error.data === "object" &&
+                                    error.data !== null &&
+                                    "message" in error.data
+                                        ? String(error.data.message)
+                                        : "Failed to delete task";
+
+                                message.error(errorMessage);
+                            }
+                        }}
+                    >
+                        Delete
+                    </Button>
+                </Space>
             ),
         });
     }
@@ -250,6 +301,41 @@ export default function TasksPage() {
                 "message" in error.data
                     ? String(error.data.message)
                     : "Failed to assign task";
+
+            message.error(errorMessage);
+        }
+    };
+
+    const handleEdit = async (values: {
+        title: string;
+        description?: string;
+        status?: TaskStatus;
+    }) => {
+        if (!selectedTask) {
+            return;
+        }
+
+        try {
+            await updateTask({
+                taskId: selectedTask.id,
+                title: values.title,
+                description: values.description,
+                status: values.status,
+            }).unwrap();
+            message.success("Task updated successfully.");
+            setEditOpen(false);
+            setSelectedTask(null);
+            editForm.resetFields();
+        } catch (error: unknown) {
+            const errorMessage =
+                typeof error === "object" &&
+                error !== null &&
+                "data" in error &&
+                typeof error.data === "object" &&
+                error.data !== null &&
+                "message" in error.data
+                    ? String(error.data.message)
+                    : "Failed to update task";
 
             message.error(errorMessage);
         }
@@ -535,6 +621,51 @@ export default function TasksPage() {
                         </Button>
                         <Button type="primary" htmlType="submit" loading={isAssigning}>
                             Save Assignment
+                        </Button>
+                    </Space>
+                </Form>
+            </Modal>
+
+            <Modal
+                open={editOpen}
+                title={selectedTask ? `Edit: ${selectedTask.title}` : "Edit Task"}
+                footer={null}
+                onCancel={() => {
+                    setEditOpen(false);
+                    setSelectedTask(null);
+                    editForm.resetFields();
+                }}
+                destroyOnHidden
+            >
+                <Form form={editForm} layout="vertical" onFinish={handleEdit}>
+                    <Form.Item
+                        label="Title"
+                        name="title"
+                        rules={[{ required: true, message: "Title is required" }]}
+                    >
+                        <Input placeholder="Task title" />
+                    </Form.Item>
+
+                    <Form.Item label="Description" name="description">
+                        <Input.TextArea rows={4} placeholder="Task description" />
+                    </Form.Item>
+
+                    <Form.Item label="Status" name="status">
+                        <Select options={statusOptions} />
+                    </Form.Item>
+
+                    <Space className="flex justify-end">
+                        <Button
+                            onClick={() => {
+                                setEditOpen(false);
+                                setSelectedTask(null);
+                                editForm.resetFields();
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type="primary" htmlType="submit" loading={isUpdating}>
+                            Save Changes
                         </Button>
                     </Space>
                 </Form>

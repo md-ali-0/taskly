@@ -26,6 +26,13 @@ type CreateTaskPayload = {
   status?: TaskStatus;
 };
 
+type UpdateTaskPayload = {
+  taskId: string;
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+};
+
 type AssignTaskPayload = {
   taskId: string;
   assignedUserId?: string | null;
@@ -54,6 +61,14 @@ export const taskApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tags.taskTag],
     }),
+    updateTask: builder.mutation<TResponse<Task>, UpdateTaskPayload>({
+      query: ({ taskId, ...body }) => ({
+        url: `/tasks/${taskId}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: [tags.taskTag],
+    }),
     assignTask: builder.mutation<TResponse<Task>, AssignTaskPayload>({
       query: ({ taskId, assignedUserId }) => ({
         url: `/tasks/${taskId}/assign`,
@@ -61,6 +76,13 @@ export const taskApi = baseApi.injectEndpoints({
         body: {
           assignedUserId: assignedUserId || null,
         },
+      }),
+      invalidatesTags: [tags.taskTag],
+    }),
+    deleteTask: builder.mutation<TResponse<{ message: string }>, { taskId: string }>({
+      query: ({ taskId }) => ({
+        url: `/tasks/${taskId}`,
+        method: "DELETE",
       }),
       invalidatesTags: [tags.taskTag],
     }),
@@ -79,6 +101,8 @@ export const taskApi = baseApi.injectEndpoints({
 export const {
   useAssignTaskMutation,
   useCreateTaskMutation,
+  useDeleteTaskMutation,
   useGetTasksQuery,
+  useUpdateTaskMutation,
   useUpdateTaskStatusMutation,
 } = taskApi;
