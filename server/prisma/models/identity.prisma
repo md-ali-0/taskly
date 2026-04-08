@@ -1,0 +1,24 @@
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  role          Role      @default(USER)
+  name          String?
+  status        String    @default("ACTIVE")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  phone         String?
+  tokenVersion  Int       @default(0) @map("token_version")
+  createdTasks  Task[]    @relation("TaskCreatedBy")
+  assignedTasks Task[]    @relation("TaskAssignedUser")
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}

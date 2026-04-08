@@ -1,0 +1,28 @@
+model AuditLog {
+  id         String          @id @default(cuid())
+  actorId    String?         @map("actor_id")
+  actor      User?           @relation(fields: [actorId], references: [id])
+  action     AuditAction
+  entityType AuditEntityType @default(TASK)
+  entityId   String          @map("entity_id")
+  summary    String?
+  before     Json?
+  after      Json?
+  createdAt  DateTime        @default(now()) @map("created_at")
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+enum AuditAction {
+  TASK_CREATED
+  TASK_UPDATED
+  TASK_DELETED
+  TASK_ASSIGNED
+  TASK_STATUS_CHANGED
+}
+
+enum AuditEntityType {
+  TASK
+}
