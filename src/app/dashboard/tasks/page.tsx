@@ -31,6 +31,7 @@ import {
   Form,
   Input,
   Modal,
+  Popconfirm,
   Row,
   Select,
   Space,
@@ -59,6 +60,7 @@ function renderStatus(status: TaskStatus) {
 
 export default function TasksPage() {
     const { message } = App.useApp();
+    const [createForm] = Form.useForm();
     const [assignForm] = Form.useForm();
     const [editForm] = Form.useForm();
     const [open, setOpen] = useState(false);
@@ -69,6 +71,7 @@ export default function TasksPage() {
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
+    const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
     const [pageCursors, setPageCursors] = useState<
         Record<number, string | undefined>
     >({ 1: undefined });
@@ -220,12 +223,13 @@ export default function TasksPage() {
                     >
                         {record.assignedUserId ? "Reassign" : "Assign"}
                     </Button>
-                    <Button
-                        type="link"
-                        danger
-                        icon={<DeleteOutlined />}
-                        loading={isDeleting && selectedTask?.id === record.id}
-                        onClick={async () => {
+                    <Popconfirm
+                        title="Delete this task?"
+                        description="This action will remove the task from active lists."
+                        okText="Delete"
+                        cancelText="Cancel"
+                        onConfirm={async () => {
+                            setDeletingTaskId(record.id);
                             try {
                                 await deleteTask({ taskId: record.id }).unwrap();
                                 message.success("Task deleted successfully.");
@@ -241,11 +245,20 @@ export default function TasksPage() {
                                         : "Failed to delete task";
 
                                 message.error(errorMessage);
+                            } finally {
+                                setDeletingTaskId(null);
                             }
                         }}
                     >
-                        Delete
-                    </Button>
+                        <Button
+                            type="link"
+                            danger
+                            icon={<DeleteOutlined />}
+                            loading={isDeleting && deletingTaskId === record.id}
+                        >
+                            Delete
+                        </Button>
+                    </Popconfirm>
                 </Space>
             ),
         });
@@ -255,10 +268,12 @@ export default function TasksPage() {
         title: string;
         description?: string;
         status?: TaskStatus;
+        assignedUserId?: string;
     }) => {
         try {
             await createTask(values).unwrap();
             message.success("Task created successfully.");
+            createForm.resetFields();
             setOpen(false);
             setPage(1);
             setPageCursors({ 1: undefined });
@@ -541,10 +556,14 @@ export default function TasksPage() {
                 open={open}
                 title="Create Task"
                 footer={null}
-                onCancel={() => setOpen(false)}
+                onCancel={() => {
+                    setOpen(false);
+                    createForm.resetFields();
+                }}
                 destroyOnHidden
             >
                 <Form
+                    form={createForm}
                     layout="vertical"
                     onFinish={handleCreate}
                     initialValues={{ status: "PENDING" }}
@@ -570,8 +589,29 @@ export default function TasksPage() {
                         <Select options={statusOptions} />
                     </Form.Item>
 
+                    <Form.Item label="Assign to" name="assignedUserId">
+                        <Select
+                            allowClear
+                            loading={isUsersLoading}
+                            placeholder="Select a user"
+                            options={assignableUsers.map((user) => ({
+                                label: user.name
+                                    ? `${user.name} (${user.email})`
+                                    : user.email,
+                                value: user.id,
+                            }))}
+                        />
+                    </Form.Item>
+
                     <Space className="flex justify-end">
-                        <Button onClick={() => setOpen(false)}>Cancel</Button>
+                        <Button
+                            onClick={() => {
+                                setOpen(false);
+                                createForm.resetFields();
+                            }}
+                        >
+                            Cancel
+                        </Button>
                         <Button
                             type="primary"
                             htmlType="submit"

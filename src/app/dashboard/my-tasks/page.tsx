@@ -2,7 +2,7 @@
 
 import Table from "@/components/ui/data-table";
 import {
-  useGetTasksQuery,
+  useGetMyTasksQuery,
   useUpdateTaskStatusMutation,
 } from "@/redux/features/task/taskApi";
 import { useAppSelector } from "@/redux/hooks";
@@ -50,14 +50,13 @@ export default function MyTasksPage() {
 
   const currentCursor = pageCursors[page];
 
-  const { data, isLoading, isFetching } = useGetTasksQuery(
+  const { data, isLoading, isFetching } = useGetMyTasksQuery(
     userId
       ? {
           limit,
           cursor: currentCursor,
           status: statusFilter === "all" ? undefined : (statusFilter as TaskStatus),
           search: searchText || undefined,
-          assignedUserId: userId,
         }
       : undefined,
   );

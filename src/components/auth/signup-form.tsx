@@ -1,13 +1,18 @@
 "use client";
 
+import { useSession } from "@/provider/session-provider";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
+import { login } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import { App, Button, Form, Input } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { message } = App.useApp();
+  const { setIsLoading, setSession } = useSession();
   const [register, { isLoading }] = useRegisterMutation();
   const [form] = Form.useForm();
 
@@ -15,7 +20,10 @@ export default function SignupForm() {
     full_name: string;
     email: string;
     password: string;
+    confirm_password: string;
   }) => {
+    setIsLoading(true);
+
     try {
       const response = await register({
         name: values.full_name,
@@ -23,12 +31,32 @@ export default function SignupForm() {
         password: values.password,
       }).unwrap();
 
-      message.success(
-        response?.data?.message ||
-        response?.message ||
-        `Registered successfully. Please sign in.`,
+      const data = response?.data?.data || response?.data || response;
+
+      if (!data?.accessToken || !data?.refreshToken || !data?.user) {
+        throw new Error("Registration payload is missing");
+      }
+
+      dispatch(
+        login({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+          user: data.user,
+          profile: null,
+        }),
       );
-      router.push("/auth/signin");
+
+      setSession({
+        isAuth: true,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        user: data.user,
+        profile: null,
+      });
+
+      message.success(response?.data?.message || response?.message || "Registration successful.");
+      form.resetFields();
+      router.push("/dashboard");
     } catch (error: unknown) {
       const errorMessage =
         typeof error === "object" &&
@@ -38,9 +66,13 @@ export default function SignupForm() {
         error.data !== null &&
         "message" in error.data
           ? String(error.data.message)
-          : "Registration failed";
+          : error instanceof Error
+            ? error.message
+            : "Registration failed";
 
       message.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,6 +126,27 @@ export default function SignupForm() {
           ]}
         >
           <Input.Password className="auth-input" placeholder="Password" />
+        </Form.Item>
+
+        <Form.Item
+          name="confirm_password"
+          label="Confirm password"
+          className="mb-3.5"
+          dependencies={["password"]}
+          rules={[
+            { required: true, message: "Please confirm your password" },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("password") === value) {
+                  return Promise.resolve();
+                }
+
+                return Promise.reject(new Error("Passwords do not match"));
+              },
+            }),
+          ]}
+        >
+          <Input.Password className="auth-input" placeholder="Confirm password" />
         </Form.Item>
 
         <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-10 rounded-md font-semibold">

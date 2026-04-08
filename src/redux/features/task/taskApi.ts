@@ -53,6 +53,14 @@ export const taskApi = baseApi.injectEndpoints({
       }),
       providesTags: [tags.taskTag],
     }),
+    getMyTasks: builder.query<TResponse<TaskListPayload>, GetTasksParams | void>({
+      query: (params) => ({
+        url: "/tasks/my-tasks",
+        method: "GET",
+        params: params ?? undefined,
+      }),
+      providesTags: [tags.taskTag],
+    }),
     createTask: builder.mutation<TResponse<Task>, CreateTaskPayload>({
       query: (body) => ({
         url: "/tasks",
@@ -101,6 +109,7 @@ export const taskApi = baseApi.injectEndpoints({
 export const {
   useAssignTaskMutation,
   useCreateTaskMutation,
+  useGetMyTasksQuery,
   useDeleteTaskMutation,
   useGetTasksQuery,
   useUpdateTaskMutation,
