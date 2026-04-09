@@ -5,9 +5,8 @@ import {
   AuditOutlined,
   CheckSquareOutlined,
   LogoutOutlined,
-  SettingOutlined,
   TeamOutlined,
-  UserOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import Link from "next/link";
@@ -49,27 +48,9 @@ export const dashboardSidebarItems: DashboardMenuItem[] = [
     ],
   },
   {
-    key: "/dashboard/users",
-    icon: <TeamOutlined />,
-    label: <Link href="/dashboard/users">Users</Link>,
-    accessFor: ["ADMIN"],
-  },
-  {
     key: "/dashboard/audit-logs",
     icon: <AuditOutlined />,
     label: <Link href="/dashboard/audit-logs">Audit Logs</Link>,
-    accessFor: ["ADMIN"],
-  },
-  {
-    key: "/dashboard/profile",
-    icon: <UserOutlined />,
-    label: <Link href="/dashboard/profile">Profile</Link>,
-    accessFor: ["ADMIN", "USER"],
-  },
-  {
-    key: "/dashboard/settings",
-    icon: <SettingOutlined />,
-    label: <Link href="/dashboard/settings">Settings</Link>,
     accessFor: ["ADMIN"],
   },
 ];
