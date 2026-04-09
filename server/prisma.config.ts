@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { defineConfig, env } from 'prisma/config';
+import { defineConfig } from 'prisma/config';
 
 const envFilesByMode: Record<string, string[]> = {
   development: ['.env', '.env.local'],
@@ -51,12 +51,18 @@ envFiles.forEach((file, index) => {
   loadEnvFile(resolve(process.cwd(), file), index > 0);
 });
 
+// Prisma generate runs during the Docker build, where Railway may not inject
+// runtime-only variables yet. Use a harmless placeholder for build-time config.
+const databaseUrl =
+  process.env.DATABASE_URL ??
+  'postgresql://placeholder:placeholder@localhost:5432/taskly_build';
+
 export default defineConfig({
   schema: 'prisma',
   migrations: {
     path: 'prisma/migrations',
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: databaseUrl,
   },
 });
