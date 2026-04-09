@@ -1,14 +1,14 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { defineConfig, env } from 'prisma/config';
+import { defineConfig } from 'prisma/config';
 
-const envFilesByMode: Record<string, string[]> = {
-  development: ['.env', '.env.local'],
-  production: ['.env', '.env.production'],
-  test: ['.env'],
-};
-
-function loadEnvFile(filePath: string, override = false) {
+// In development, attempt to load .env files so Prisma CLI commands (e.g.
+// `prisma migrate dev`) work without a globally exported DATABASE_URL.
+// In production (Railway and other container environments) environment
+// variables are injected directly into process.env, so .env files are
+// intentionally absent — we skip the file-loading step entirely and read
+// DATABASE_URL straight from process.env.
+function tryLoadEnvFile(filePath: string, override = false) {
   if (!existsSync(filePath)) {
     return;
   }
@@ -38,18 +38,19 @@ function loadEnvFile(filePath: string, override = false) {
       value = value.slice(1, -1);
     }
 
+    // Never overwrite a value that was already injected (e.g. by Railway).
     if (override || process.env[key] === undefined) {
       process.env[key] = value;
     }
   }
 }
 
-const nodeEnv = process.env.NODE_ENV ?? 'development';
-const envFiles = envFilesByMode[nodeEnv] ?? ['.env'];
-
-envFiles.forEach((file, index) => {
-  loadEnvFile(resolve(process.cwd(), file), index > 0);
-});
+if (process.env.NODE_ENV !== 'production') {
+  const devFiles = ['.env', '.env.local'];
+  devFiles.forEach((file, index) => {
+    tryLoadEnvFile(resolve(process.cwd(), file), index > 0);
+  });
+}
 
 export default defineConfig({
   schema: 'prisma',
@@ -57,6 +58,6 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: process.env.DATABASE_URL,
   },
 });
