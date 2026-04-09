@@ -78,15 +78,15 @@ export default function LoginForm() {
     } catch (error: unknown) {
       const errorMessage =
         typeof error === "object" &&
-        error !== null &&
-        "data" in error &&
-        typeof error.data === "object" &&
-        error.data !== null &&
-        "message" in error.data
+          error !== null &&
+          "data" in error &&
+          typeof error.data === "object" &&
+          error.data !== null &&
+          "message" in error.data
           ? String(error.data.message)
           : error instanceof Error
             ? error.message
-          : "Login failed";
+            : "Login failed";
 
       message.error(errorMessage);
     } finally {
@@ -146,18 +146,16 @@ export default function LoginForm() {
           </Link>
         </div>
 
-        {process.env.NODE_ENV === "development" && (
-          <div className="mb-3.5">
-            <Dropdown menu={{ items: devItems }} placement="bottom" trigger={["click"]}>
-              <Button
-                block
-                className="border-amber-200 bg-amber-50 font-semibold text-amber-700 hover:border-amber-300 hover:bg-amber-100"
-              >
-                Fill Credentials
-              </Button>
-            </Dropdown>
-          </div>
-        )}
+        <div className="mb-3.5">
+          <Dropdown menu={{ items: devItems }} placement="bottom" trigger={["click"]}>
+            <Button
+              block
+              className="border-amber-200 bg-amber-50 font-semibold text-amber-700 hover:border-amber-300 hover:bg-amber-100"
+            >
+              Fill Credentials
+            </Button>
+          </Dropdown>
+        </div>
 
         <Button type="primary" htmlType="submit" loading={isLoading} block size="large" className="h-10 rounded-md font-semibold">
           Sign in
