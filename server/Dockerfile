@@ -15,4 +15,4 @@ FROM deps AS runtime
 COPY . .
 COPY --from=build /app/dist ./dist
 EXPOSE 5000
-CMD ["sh", "-c", "pnpm prisma migrate deploy && pnpm prisma:seed && pnpm start:prod"]
+CMD ["sh", "-c", "pnpm prisma generate && pnpm prisma migrate deploy && pnpm prisma:seed && pnpm start:prod"]
