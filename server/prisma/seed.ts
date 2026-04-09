@@ -1,7 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { Pool } from 'pg';
 import { loadEnvironment } from '../src/common/config/env.loader';
 
 const demoUsers = [
@@ -28,11 +27,9 @@ async function main() {
     throw new Error('DATABASE_URL is required to run Prisma seed');
   }
 
-  const pool = new Pool({
-    connectionString,
+  const prisma = new PrismaClient({
+    adapter: new PrismaPg({ connectionString }),
   });
-  const adapter = new PrismaPg(pool);
-  const prisma = new PrismaClient({ adapter });
 
   try {
     for (const user of demoUsers) {
@@ -65,7 +62,6 @@ async function main() {
     console.log('User: user@taskly.com / User@123456');
   } finally {
     await prisma.$disconnect();
-    await pool.end();
   }
 }
 

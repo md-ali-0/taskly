@@ -31,7 +31,7 @@ services:
       APP_VERSION: 1.0.0
       PORT: 5000
       API_PREFIX: /api/v1
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/taskly_db_dev
+      DATABASE_URL: postgresql://neondb_owner:npg_KrXbSCM39GIv@ep-lucky-dream-a1xwqjyx-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       JWT_SECRET: replace_with_a_32_plus_character_secret_value
       JWT_REFRESH_SECRET: replace_with_a_second_32_plus_character_secret
       ACCESS_TOKEN_EXPIRATION: 365d
