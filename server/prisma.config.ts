@@ -58,6 +58,17 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: process.env.DATABASE_URL,
+    url: () => {
+      const url = process.env.DATABASE_URL;
+
+      if (!url) {
+        throw new Error(
+          'DATABASE_URL environment variable is not set. ' +
+            'Ensure it is injected before running Prisma commands.',
+        );
+      }
+
+      return url;
+    },
   },
 });
