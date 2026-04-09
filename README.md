@@ -7,11 +7,11 @@ This repository contains both applications in one place:
 - `client/` - Next.js frontend
 - `server/` - NestJS backend
 
-This is Deployed Live URLs:
+## This is Deployed Live URLs:
 
-- Frontend: [https://taskly-app.up.railway.app](https://taskly-app.up.railway.app)
-- Backend: [https://taskly-server.up.railway.app](https://taskly-server.up.railway.app)
-- Health check: [https://taskly-server.up.railway.app/health](https://taskly-server.up.railway.app/health)
+- <a href="https://taskly-app.up.railway.app" target="_blank">Frontend</a>  
+- <a href="https://taskly-server.up.railway.app" target="_blank">Backend</a>  
+- <a href="https://taskly-server.up.railway.app/health" target="_blank">Health Check</a>
 
 The focus of this project is clean architecture, maintainable code structure, role-based access control, and a usable audit trail for important task actions.
 
