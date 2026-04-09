@@ -52,23 +52,25 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
+function requireDatabaseUrl(): string {
+  const url = process.env.DATABASE_URL;
+
+  if (!url) {
+    throw new Error(
+      'DATABASE_URL environment variable is not set. ' +
+        'Ensure it is injected before running Prisma commands.',
+    );
+  }
+
+  return url;
+}
+
 export default defineConfig({
   schema: 'prisma',
   migrations: {
     path: 'prisma/migrations',
   },
   datasource: {
-    url: () => {
-      const url = process.env.DATABASE_URL;
-
-      if (!url) {
-        throw new Error(
-          'DATABASE_URL environment variable is not set. ' +
-            'Ensure it is injected before running Prisma commands.',
-        );
-      }
-
-      return url;
-    },
+    url: requireDatabaseUrl(),
   },
 });
